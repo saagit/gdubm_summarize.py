@@ -66,17 +66,29 @@ def print_benchmark_summary(filename, variant):
           f'{average_of_samples(variant["access-time-samples"]) * 1e3:.2f} msec '
           f'({len(variant["access-time-samples"])} samples)')
 
+def print_benchmark_averages(filename, variant):
+    """Print the read rate, write rate, access time averages and filename."""
+    print(f'{round(average_of_samples(variant["read-samples"]))}\t'
+          f'{round(average_of_samples(variant["write-samples"]))}\t'
+          f'{average_of_samples(variant["access-time-samples"]):.6f}\t'
+          f'{filename}')
+
 def main():
     """The main event."""
 
     argp = argparse.ArgumentParser()
+    argp.add_argument('-t', '--tsv', action='store_true',
+                      help='Print the averages and filename separated by tabs.')
     argp.add_argument('benchmark_cache_files', nargs='+',
                       help='Benchmark cache file created by Gnome Disk Utility')
     args = argp.parse_args()
 
     for filename in args.benchmark_cache_files:
         variant = read_variant_from_benchmark_file(filename)
-        print_benchmark_summary(filename, variant)
+        if args.tsv:
+            print_benchmark_averages(filename, variant)
+        else:
+            print_benchmark_summary(filename, variant)
 
     return 0
 
